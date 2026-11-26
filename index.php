@@ -1,5 +1,6 @@
 <?php
 require __DIR__ . '/lib/bootstrap.php';
+require __DIR__ . '/lib/stats.php';
 
 maybe_auto_sync();
 $s = settings();
@@ -11,6 +12,7 @@ $min = (int) cfg('min_amount');
 $max = (int) cfg('max_amount');
 $presets = [10, 20, 50, 100];
 $last = last_donation();
+$st = compute_stats();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -25,7 +27,7 @@ $last = last_donation();
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#f8f3ec">
 <noscript><link rel="stylesheet" href="assets/css/nojs.css"></noscript>
-<link rel="stylesheet" href="assets/css/memorial.css?v=5">
+<link rel="stylesheet" href="assets/css/memorial.css?v=7">
 </head>
 <body>
 
@@ -80,6 +82,18 @@ $last = last_donation();
       <span>Última donación: <strong data-last-name><?= e($last['name'] ?? '') ?></strong> <small data-last-ago><?= e($last['ago'] ?? '') ?></small></span>
     </p>
 
+    <div class="fees" data-fees>
+      <p class="fees-title">Transparencia: lo que cobra Stripe</p>
+      <div class="fees-grid<?= $st['count'] ? '' : ' is-empty' ?>" data-fees-grid>
+        <div><span>Donado</span><strong data-donated><?= money($st['donated']) ?></strong></div>
+        <div class="minus"><span>Comisión de Stripe</span><strong>− <span data-fees-total><?= money($st['fees']) ?></span></strong><em data-fee-pct><?= pct($st['fee_pct']) ?> de lo donado</em></div>
+        <div class="eq"><span>Llega a la cuenta</span><strong data-net><?= money($st['net']) ?></strong></div>
+      </div>
+      <p class="fees-note">Stripe es la plataforma que procesa los pagos con tarjeta de forma segura y cobra una comisión por cada donación
+        (en Europa, normalmente el 1,5 % + 0,25 €; algo más con tarjetas de fuera de Europa). Nosotros no nos quedamos nada:
+        <?= settings()['bar_mode'] === 'net' ? 'la barra muestra lo que llega realmente a la cuenta.' : 'todo lo que llega se destina al servicio funerario.' ?></p>
+    </div>
+
     <?php if ($p['raised'] >= $p['goal']): ?>
       <p class="notice notice-goal">Gracias de corazón: entre todos hemos alcanzado la meta.</p>
     <?php endif; ?>
@@ -121,8 +135,27 @@ $last = last_donation();
           <input id="donor_name" name="donor_name" type="text" required minlength="3" maxlength="60"
                  autocomplete="name" autocapitalize="words" placeholder="Ej. Juan Pérez"
                  pattern="\s*[^\s]+\s+[^\s].*" title="Escribe tu nombre y apellido">
-          <label class="anon"><input type="checkbox" name="anonymous" value="1"> Prefiero que mi nombre no aparezca en la web</label>
         </div>
+        <fieldset class="visibility">
+          <legend>¿Quieres que tu nombre aparezca en la web?</legend>
+          <div class="vis-options">
+            <label class="vis">
+              <input type="radio" name="show_name" value="1" required>
+              <span>
+                <strong>Sí, mostrar mi nombre</strong>
+                <small>Aparecerá como «Última donación: <em data-preview>tu nombre</em>»</small>
+              </span>
+            </label>
+            <label class="vis">
+              <input type="radio" name="show_name" value="0" required>
+              <span>
+                <strong>No, donar de forma anónima</strong>
+                <small>Aparecerá como «Última donación: Anónimo»</small>
+              </span>
+            </label>
+          </div>
+          <p class="vis-note">Tu nombre siempre llega a los organizadores para poder darte las gracias.</p>
+        </fieldset>
         <div class="hp" aria-hidden="true"><label>No rellenar <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
         <button type="submit" class="btn btn-donate"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 3 5 6.5 5c2.1 0 3.6 1.2 4.5 2.6l1 1.5 1-1.5C13.9 6.2 15.4 5 17.5 5 21 5 23.1 8.6 21.6 11.9 19.5 16.4 12 21 12 21z"/></svg><span>Realiza tu donación</span></button>
         <p class="secure"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h1zm2 0h6V7a3 3 0 0 0-6 0v3z"/></svg> Pago seguro con tarjeta, Apple Pay o Google Pay a través de Stripe. Al pagar puedes dejar un mensaje para la familia.</p>
@@ -178,6 +211,6 @@ $last = last_donation();
 </a>
 <?php endif; ?>
 
-<script src="assets/js/memorial.js?v=4" defer></script>
+<script src="assets/js/memorial.js?v=6" defer></script>
 </body>
 </html>

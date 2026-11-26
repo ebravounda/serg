@@ -42,7 +42,11 @@ $donorName = normalize_person_name((string) ($_POST['donor_name'] ?? ''));
 if (mb_strlen($donorName) < 3 || count(explode(' ', $donorName)) < 2) {
     back('Escribe tu nombre y apellido.');
 }
-$anonymous = !empty($_POST['anonymous']) ? '1' : '0';
+$showName = (string) ($_POST['show_name'] ?? '');
+if (!in_array($showName, ['1', '0'], true)) {
+    back('Indica si quieres que tu nombre aparezca en la web.');
+}
+$anonymous = $showName === '1' ? '0' : '1';
 
 $campaign = (string) cfg('campaign_id');
 $label = 'Donación en memoria de ' . $s['name'];

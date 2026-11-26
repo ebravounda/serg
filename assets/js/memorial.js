@@ -25,9 +25,21 @@
         donor.setCustomValidity(/\S+\s+\S/.test(donor.value.trim()) ? '' : 'Escribe tu nombre y apellido (ej. Juan Pérez)');
       };
       donor.addEventListener('input', check);
+      // vista previa de cómo aparecerá el nombre
+      var preview = form.querySelector('[data-preview]');
+      var fmt = function (v) {
+        return v.trim().replace(/\s+/g, ' ').toLowerCase().replace(/(^|[\s-])(\S)/g, function (m, a, b) { return a + b.toUpperCase(); })
+          .replace(/ (De|Del|La|Las|Los|Y) /g, function (m) { return m.toLowerCase(); });
+      };
+      donor.addEventListener('input', function () { if (preview) preview.textContent = fmt(donor.value) || 'tu nombre'; });
       donor.addEventListener('invalid', check);
       check();
     }
+    var radios = form.querySelectorAll('input[name="show_name"]');
+    radios.forEach(function (r) {
+      r.addEventListener('invalid', function () { r.setCustomValidity('Elige si quieres que tu nombre aparezca en la web'); });
+      r.addEventListener('change', function () { radios.forEach(function (x) { x.setCustomValidity(''); }); });
+    });
     form.addEventListener('submit', function () {
       btn.disabled = true;
       btnLabel.textContent = 'Abriendo el pago seguro…';
@@ -97,6 +109,13 @@
         set('[data-percent]', p.percent + '%');
         set('[data-count]', p.count);
         set('[data-count-label]', p.count === 1 ? 'persona ha aportado' : 'personas han aportado');
+        if (p.donated_text) {
+          set('[data-donated]', p.donated_text);
+          set('[data-fees-total]', p.fees_text);
+          set('[data-fee-pct]', p.fee_pct_text);
+          set('[data-net]', p.net_text);
+          if (p.count > 0) { var g = document.querySelector('[data-fees-grid]'); if (g) g.classList.remove('is-empty'); }
+        }
         var last = document.querySelector('[data-last]');
         if (last && p.last_name) {
           var nameEl = last.querySelector('[data-last-name]');
