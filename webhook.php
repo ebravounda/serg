@@ -51,7 +51,7 @@ try {
         case 'charge.refunded':
             if (!empty($obj['payment_intent'])) {
                 $pi = stripe_request('GET', 'payment_intents/' . rawurlencode($obj['payment_intent']), [
-                    'expand' => ['latest_charge'],
+                    'expand' => ['latest_charge.balance_transaction'],
                 ]);
                 record_payment_intent($pi);
             }

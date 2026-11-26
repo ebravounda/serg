@@ -63,3 +63,66 @@ tr.refunded td:last-child, tr.refunded td.num { text-decoration: none; }
 .portrait-small { width: 120px; height: 120px; margin: 0; box-shadow: 0 0 0 1px var(--line); }
 .portrait-small .monogram { font-size: 50px; }
 .photo-row form { margin: 0 0 8px; }
+
+.tag { display: inline-block; padding: 1px 8px; border-radius: 99px; font-size: 12px; background: #ece8e1; color: var(--soft); white-space: nowrap; }
+.tag-enviado { background: #e6eee0; color: #33482a; }
+.tag-error { background: #f6e3df; color: var(--error); }
+.tag-enviando { background: #f7f1e1; color: #6b5414; }
+form.inline { display: inline; margin: 0 0 0 6px; }
+.test-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 14px 0; }
+.admin .test-row input[type=email] { width: auto; flex: 1 1 220px; max-width: 320px; margin: 0; }
+.test-row .btn { margin-top: 0; }
+.quote { font-family: var(--serif); font-style: italic; font-size: 17px; color: var(--ink); }
+td.wrap, .wrap { white-space: normal; min-width: 160px; }
+.field-help { margin: -8px 0 16px; }
+.save-connections { margin-bottom: 22px; }
+.tests form { margin: 0 0 4px; }
+.tabs { overflow-x: auto; }
+.tabs a { white-space: nowrap; }
+
+/* Estadísticas */
+.head-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0 14px; }
+.kpi { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+.kpi span { display: block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.kpi strong { display: block; font-family: var(--serif); font-weight: 400; font-size: 26px; margin: 4px 0 2px; color: var(--ink); }
+.kpi em { font-style: normal; font-size: 13px; color: var(--soft); }
+.kpi-main { grid-column: 1 / -1; background: var(--accent); border-color: var(--accent); }
+.kpi-main span, .kpi-main em { color: #e9e4dc; }
+.kpi-main strong { color: #fff; font-size: 36px; }
+.bar.big { height: 12px; }
+tr.total td { font-weight: 600; border-top: 2px solid var(--ink); }
+.export-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
+.export-row .btn { margin-top: 0; }
+.chart { display: grid; gap: 6px; }
+.chart-row { display: grid; grid-template-columns: 52px 1fr 130px; gap: 10px; align-items: center; font-size: 14px; }
+.chart-label { color: var(--muted); }
+.chart-bar { height: 14px; background: #efebe5; border-radius: 3px; overflow: hidden; }
+.chart-bar i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.chart-value { text-align: right; }
+.chart-value small { color: var(--muted); }
+.two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.two-cols .box { margin-bottom: 22px; }
+.hours { display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px; align-items: end; height: 120px; }
+.hour { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; text-align: center; }
+.hour i { display: block; background: var(--accent); border-radius: 2px 2px 0 0; min-height: 1px; }
+.hour span { font-size: 10px; color: var(--muted); margin-top: 3px; }
+table.tx td { vertical-align: top; }
+.admin select { display: block; width: 100%; margin-top: 5px; padding: 9px 11px; font: inherit; font-size: 15px; border: 1px solid var(--line); border-radius: 4px; background: #fff; color: var(--ink); }
+.install { max-width: 720px; padding-top: 50px; padding-bottom: 60px; }
+.install h1 { font-size: 38px; margin: 8px 0 22px; }
+.checks { list-style: none; padding: 0; margin: 0; }
+.checks li { padding: 6px 0; border-bottom: 1px solid var(--line); }
+.checks .ok { color: #33482a; } .checks .ko { color: var(--error); } .checks .warn { color: #6b5414; }
+details { margin-top: 6px; } summary { cursor: pointer; margin-bottom: 10px; }
+
+@media (max-width: 760px) {
+  .kpis { grid-template-columns: 1fr 1fr; }
+  .two-cols { grid-template-columns: 1fr; gap: 0; }
+  .chart-row { grid-template-columns: 44px 1fr 100px; font-size: 13px; }
+  .admin-head { padding-top: 20px; }
+  .panel { padding-left: 14px; padding-right: 14px; }
+  .box { padding: 16px; }
+  .item { flex-direction: column; gap: 8px; }
+  .item-actions { flex-direction: row; align-items: center; gap: 16px; }
+}

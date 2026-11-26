@@ -11,6 +11,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: index.php#donar', true, 303);
     exit;
 }
+// Anti-abuso: campo trampa para bots y límite de intentos por IP
+// (frena las «pruebas de tarjetas robadas» que sufren las páginas de donación)
+if (($_POST['website'] ?? '') !== '') {
+    back('No pudimos procesar la solicitud.');
+}
+if (!rate_limit('checkout', 10, 3600)) {
+    back('Has hecho demasiados intentos. Vuelve a intentarlo dentro de un rato.');
+}
 $s = settings();
 if (!$s['donations_open'] || !stripe_ready()) {
     back('Las donaciones no están disponibles en este momento.');
@@ -54,6 +62,14 @@ $params = [
         'description' => $label,
         'metadata' => ['campaign' => $campaign],
     ],
+    // Mensaje opcional para la familia (se gestiona en el panel → Mensajes)
+    'custom_fields' => [[
+        'key' => 'mensaje',
+        'label' => ['type' => 'custom', 'custom' => 'Mensaje para la familia (opcional)'],
+        'type' => 'text',
+        'optional' => 'true',
+        'text' => ['maximum_length' => 255],
+    ]],
     'success_url' => site_url('gracias.php') . '?session_id={CHECKOUT_SESSION_ID}',
     'cancel_url' => site_url('index.php') . '?cancelado=1#donar',
 ];

@@ -1,44 +1,92 @@
 (function () {
-  // Importe personalizado: se muestra al elegir "Otro"
+  var doc = document.documentElement;
+
+  // ---------- Importe personalizado: se muestra al elegir "Otro" ----------
   var form = document.querySelector('.donate');
   if (form) {
     var custom = form.querySelector('[data-custom]');
     var input = form.querySelector('#custom');
-    var sync = function () {
-      var other = form.querySelector('input[name="amount"][value="otro"]').checked;
+    var btn = form.querySelector('button[type="submit"]');
+    var btnLabel = btn.querySelector('span') || btn;
+    var original = btnLabel.textContent;
+    var isOther = function () { return form.querySelector('input[name="amount"][value="otro"]').checked; };
+    var sync = function (focus) {
+      var other = isOther();
       custom.classList.toggle('is-visible', other);
       input.required = other;
-      if (other) input.focus();
+      if (other && focus) input.focus();
     };
-    form.addEventListener('change', function (e) { if (e.target.name === 'amount') sync(); });
-    custom.classList.toggle('is-visible', form.querySelector('input[value="otro"]').checked);
+    form.addEventListener('change', function (e) { if (e.target.name === 'amount') sync(true); });
+    sync(false);
     form.addEventListener('submit', function () {
-      var btn = form.querySelector('button[type="submit"]');
       btn.disabled = true;
-      btn.textContent = 'Redirigiendo al pago seguro…';
+      btnLabel.textContent = 'Abriendo el pago seguro…';
     });
-    // Si el usuario vuelve con el botón "atrás", reactiva el botón
+    // Al volver con "atrás" desde Stripe, reactiva el botón
     window.addEventListener('pageshow', function () {
-      var btn = form.querySelector('button[type="submit"]');
       btn.disabled = false;
-      btn.textContent = 'Realiza tu donación';
+      btnLabel.textContent = original;
     });
   }
 
-  // Actualiza la barra cada minuto sin recargar
+  // ---------- Aparición suave de las secciones ----------
+  var reveals = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window && reveals.length) {
+    doc.classList.add('js-reveal');
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
+      });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    // red de seguridad: nada queda oculto aunque el navegador no avise del scroll
+    var showAll = function () { reveals.forEach(function (el) { el.classList.add('is-in'); }); };
+    window.addEventListener('scroll', function onScroll() {
+      if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 40) { showAll(); window.removeEventListener('scroll', onScroll); }
+    }, { passive: true });
+    setTimeout(showAll, 6000);
+    reveals.forEach(function (el) {
+      // lo que ya está a la vista aparece sin esperar
+      if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('is-in');
+      else io.observe(el);
+    });
+  }
+
+  // ---------- Botón flotante en móvil: se oculta cuando la colecta está a la vista ----------
+  var cta = document.querySelector('[data-sticky-cta]');
+  var fund = document.getElementById('donar');
+  if (cta && fund && 'IntersectionObserver' in window) {
+    var fundVisible = false;
+    var update = function () { cta.classList.toggle('is-hidden', fundVisible || window.scrollY < 320); };
+    new IntersectionObserver(function (entries) {
+      fundVisible = entries[0].isIntersecting;
+      update();
+    }, { threshold: 0.05 }).observe(fund);
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  }
+
+  // ---------- Actualiza la barra cada minuto sin recargar ----------
   var bar = document.querySelector('[data-bar]');
   if (!bar || !window.fetch) return;
+  // la barra se llena con una animación suave al cargar
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var target = bar.style.width;
+    bar.style.width = '0';
+    void bar.offsetWidth;
+    requestAnimationFrame(function () { setTimeout(function () { bar.style.width = target; }, 250); });
+  }
+  var set = function (sel, text) { var el = document.querySelector(sel); if (el) el.textContent = text; };
   function refresh() {
-    fetch('estado.php', { cache: 'no-store' })
+    fetch('estado.php', { cache: 'no-store', credentials: 'same-origin' })
       .then(function (r) { return r.json(); })
       .then(function (p) {
         bar.style.width = p.percent + '%';
         bar.parentNode.setAttribute('aria-valuenow', p.percent);
-        document.querySelector('[data-raised]').textContent = p.raised_text;
-        document.querySelector('[data-goal]').textContent = p.goal_text;
-        document.querySelector('[data-percent]').textContent = p.percent + '%';
-        document.querySelector('[data-count]').textContent = p.count;
-        document.querySelector('[data-count-label]').textContent = p.count === 1 ? 'aporte' : 'aportes';
+        set('[data-raised]', p.raised_text);
+        set('[data-goal]', p.goal_text);
+        set('[data-percent]', p.percent + '%');
+        set('[data-count]', p.count);
+        set('[data-count-label]', p.count === 1 ? 'persona ha aportado' : 'personas han aportado');
       })
       .catch(function () {});
   }

@@ -1,6 +1,9 @@
 <?php
 /**
- * Copia este archivo como config.php y completa los datos.
+ * Valores por defecto. NO hace falta editar este archivo:
+ * el instalador (install.php) crea config.php con la base de datos,
+ * y las claves de Stripe y Resend se ponen desde el panel → Conexiones.
+ *
  * config.php NO se sube a git (contiene claves privadas).
  */
 return [
@@ -20,16 +23,22 @@ return [
     // y SOLO los pagos con esa etiqueta suman en la barra. No lo cambies una vez publicada.
     'campaign_id' => 'memoria-sergio-elio-alderete',
 
+    // Correo con Resend (también configurable desde el panel → Conexiones)
+    'resend_api_key' => '',
+    'mail_from_email' => '',      // remitente, de un dominio verificado en Resend
+    'mail_from_name' => 'Amigos de Sergio',
+    'mail_reply_to' => '',        // opcional: a dónde llegan las respuestas
+    'notify_email' => '',         // opcional: recibe un aviso de cada donación
+
     'currency' => 'eur',
 
     // Texto que verá el donante en el extracto de su tarjeta (máx. 22 caracteres, sin < > \ ' " *).
     'statement_descriptor_suffix' => 'SERGIO ALDERETE',
 
-    // Contraseña del panel admin, como hash. Genérala con:
-    //   php -r 'echo password_hash("tu-contraseña", PASSWORD_DEFAULT), PHP_EOL;'
-    'admin_password_hash' => '',
+    // Opcional: limita el acceso al panel a ciertas IPs, ej. ['81.2.3.4']
+    'admin_allowed_ips' => [],
 
     // Importes permitidos por donación (en euros)
-    'min_amount' => 1,
+    'min_amount' => 5,
     'max_amount' => 5000,
 ];

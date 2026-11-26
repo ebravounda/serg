@@ -2,3 +2,4 @@ config.php
 data/*.php
 uploads/*
 !uploads/.htaccess
+dist/

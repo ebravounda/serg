@@ -1,7 +1,34 @@
 Options -Indexes
 DirectoryIndex index.php
+ServerSignature Off
 
 # Archivos internos: nunca accesibles desde el navegador
-<FilesMatch "^(config|config\.example)\.php$|\.md$">
+<FilesMatch "^(config|config\.example)\.php$|\.(md|sql|log|bak|zip|ini|sh|json|lock|dist)$|^\.">
   Require all denied
 </FilesMatch>
+
+# Cabeceras de seguridad también para archivos estáticos
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header unset X-Powered-By
+</IfModule>
+
+# Redirección a https (actívala quitando los # cuando el certificado SSL funcione)
+# RewriteEngine On
+# RewriteCond %{HTTPS} off
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType image/jpeg "access plus 6 months"
+  ExpiresByType image/png "access plus 6 months"
+  ExpiresByType image/webp "access plus 6 months"
+  ExpiresByType image/svg+xml "access plus 6 months"
+</IfModule>
