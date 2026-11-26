@@ -12,6 +12,8 @@ No necesita instalar nada más ni usar la terminal.
 
 ## Puesta en marcha (10 minutos)
 
+> 📘 **Guía detallada paso a paso, con solución de problemas: [GUIA-DE-INSTALACION.md](GUIA-DE-INSTALACION.md)**
+
 ### 1. Crea la base de datos (cPanel → «Bases de datos MySQL»)
 1. **Crear nueva base de datos**: por ejemplo `memorial` (cPanel le añade un prefijo: `usuario_memorial`).
 2. **Agregar nuevo usuario**: elige un nombre y una contraseña larga. Apúntala.
