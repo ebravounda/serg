@@ -1,0 +1,7 @@
+Options -Indexes
+DirectoryIndex index.php
+
+# Archivos internos: nunca accesibles desde el navegador
+<FilesMatch "^(config|config\.example)\.php$|\.md$">
+  Require all denied
+</FilesMatch>

@@ -1,0 +1,65 @@
+.admin { font-size: 15px; line-height: 1.55; }
+.admin h2 { font-size: 21px; margin-bottom: 16px; }
+.login { max-width: 380px; padding-top: 90px; text-align: center; }
+.login h1 { font-size: 36px; margin: 10px 0 24px; }
+.login form { text-align: left; }
+
+.admin-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; max-width: 960px; margin: 0 auto; padding: 28px 22px 14px; }
+.admin-total { margin: 4px 0 0; color: var(--soft); }
+.admin-total strong { font-family: var(--serif); font-weight: 400; font-size: 26px; color: var(--ink); }
+.admin-actions { display: flex; gap: 18px; align-items: center; }
+.admin-actions form { margin: 0; }
+
+.tabs { max-width: 960px; margin: 0 auto; padding: 0 22px; display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.tabs a { padding: 10px 14px; text-decoration: none; color: var(--soft); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tabs a.on { color: var(--ink); border-color: var(--accent); }
+
+.panel { max-width: 960px; padding: 24px 22px 60px; }
+.box { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 22px; margin-bottom: 22px; }
+.box-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+.box-head h2 { margin: 0; }
+.box-head form { margin: 0; }
+
+.admin label { display: block; margin-bottom: 14px; color: var(--soft); font-size: 14px; }
+.admin input:not([type=checkbox]):not([type=radio]):not([type=file]), .admin textarea {
+  display: block; width: 100%; margin-top: 5px; padding: 9px 11px; font: inherit; font-size: 15px;
+  color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 4px;
+}
+.admin input[type=file] { display: block; margin: 0 0 10px; }
+.admin textarea { resize: vertical; line-height: 1.55; }
+.admin input:focus, .admin textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.row { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; }
+.row .grow { flex: 1 1 240px; }
+.check { display: flex !important; gap: 8px; align-items: center; padding-bottom: 10px; }
+.hint { color: var(--muted); font-size: 13px; }
+
+.btn-small { width: auto; margin-top: 4px; padding: 10px 18px; font-size: 15px; }
+.link { background: none; border: 0; padding: 0; font: inherit; color: var(--soft); text-decoration: underline; cursor: pointer; }
+.danger { color: var(--error); }
+.cancel { margin-left: 14px; color: var(--soft); }
+
+.flash { padding: 11px 14px; border-radius: 4px; margin: 0 0 18px; font-size: 14px; border-left: 3px solid; }
+.flash-ok { background: #eef2ea; border-color: #4d6b3c; color: #33482a; }
+.flash-error { background: #f6ebe8; border-color: var(--error); color: var(--error); }
+.flash-warn { background: #f7f1e1; border-color: #9a7a24; color: #6b5414; }
+
+.item { display: flex; justify-content: space-between; gap: 18px; padding: 14px 0; border-top: 1px solid var(--line); }
+.item h3 { font-size: 18px; margin: 2px 0 4px; }
+.item-date { margin: 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.item-body { margin: 0; color: var(--soft); }
+.item-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; white-space: nowrap; }
+.item-actions form { margin: 0; }
+
+.table-wrap { overflow-x: auto; margin-top: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-weight: 500; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+.num { text-align: right; }
+tfoot td { font-weight: 600; border-bottom: 0; }
+tr.refunded td { color: var(--muted); text-decoration: line-through; }
+tr.refunded td:last-child, tr.refunded td.num { text-decoration: none; }
+
+.photo-row { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+.portrait-small { width: 120px; height: 120px; margin: 0; box-shadow: 0 0 0 1px var(--line); }
+.portrait-small .monogram { font-size: 50px; }
+.photo-row form { margin: 0 0 8px; }
