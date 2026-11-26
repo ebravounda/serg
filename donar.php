@@ -37,6 +37,13 @@ if ($cents < $min * 100 || $cents > $max * 100) {
     back("El importe debe estar entre $min € y " . number_format($max, 0, ',', '.') . ' €.');
 }
 
+// Nombre y apellido del donante (obligatorio) y opción de aparecer como anónimo
+$donorName = normalize_person_name((string) ($_POST['donor_name'] ?? ''));
+if (mb_strlen($donorName) < 3 || count(explode(' ', $donorName)) < 2) {
+    back('Escribe tu nombre y apellido.');
+}
+$anonymous = !empty($_POST['anonymous']) ? '1' : '0';
+
 $campaign = (string) cfg('campaign_id');
 $label = 'Donación en memoria de ' . $s['name'];
 
@@ -57,10 +64,10 @@ $params = [
     'locale' => 'es',
     'line_items' => [['price_data' => $priceData, 'quantity' => 1]],
     // La etiqueta "campaign" es lo que separa este dinero del resto de la cuenta.
-    'metadata' => ['campaign' => $campaign],
+    'metadata' => ['campaign' => $campaign, 'donor_name' => $donorName, 'donor_anonymous' => $anonymous],
     'payment_intent_data' => [
-        'description' => $label,
-        'metadata' => ['campaign' => $campaign],
+        'description' => $label . ' — ' . $donorName,
+        'metadata' => ['campaign' => $campaign, 'donor_name' => $donorName, 'donor_anonymous' => $anonymous],
     ],
     // Mensaje opcional para la familia (se gestiona en el panel → Mensajes)
     'custom_fields' => [[

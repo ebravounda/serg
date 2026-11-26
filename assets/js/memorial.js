@@ -18,6 +18,16 @@
     };
     form.addEventListener('change', function (e) { if (e.target.name === 'amount') sync(true); });
     sync(false);
+    // Aviso en español si falta el apellido
+    var donor = form.querySelector('#donor_name');
+    if (donor) {
+      var check = function () {
+        donor.setCustomValidity(/\S+\s+\S/.test(donor.value.trim()) ? '' : 'Escribe tu nombre y apellido (ej. Juan Pérez)');
+      };
+      donor.addEventListener('input', check);
+      donor.addEventListener('invalid', check);
+      check();
+    }
     form.addEventListener('submit', function () {
       btn.disabled = true;
       btnLabel.textContent = 'Abriendo el pago seguro…';
@@ -87,8 +97,17 @@
         set('[data-percent]', p.percent + '%');
         set('[data-count]', p.count);
         set('[data-count-label]', p.count === 1 ? 'persona ha aportado' : 'personas han aportado');
+        var last = document.querySelector('[data-last]');
+        if (last && p.last_name) {
+          var nameEl = last.querySelector('[data-last-name]');
+          var changed = nameEl.textContent !== p.last_name || last.classList.contains('is-empty');
+          nameEl.textContent = p.last_name;
+          set('[data-last-ago]', p.last_ago || '');
+          last.classList.remove('is-empty');
+          if (changed) { last.classList.remove('is-new'); void last.offsetWidth; last.classList.add('is-new'); }
+        }
       })
       .catch(function () {});
   }
-  setInterval(function () { if (!document.hidden) refresh(); }, 60000);
+  setInterval(function () { if (!document.hidden) refresh(); }, 30000);
 })();

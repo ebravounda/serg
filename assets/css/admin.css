@@ -126,3 +126,6 @@ details { margin-top: 6px; } summary { cursor: pointer; margin-bottom: 10px; }
   .item { flex-direction: column; gap: 8px; }
   .item-actions { flex-direction: row; align-items: center; gap: 16px; }
 }
+
+form.inline-block { display: block; margin: 2px 0 0; }
+.link.small { font-size: 12px; }

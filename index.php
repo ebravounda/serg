@@ -10,6 +10,7 @@ $error = $_GET['error'] ?? '';
 $min = (int) cfg('min_amount');
 $max = (int) cfg('max_amount');
 $presets = [10, 20, 50, 100];
+$last = last_donation();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -24,7 +25,7 @@ $presets = [10, 20, 50, 100];
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#f8f3ec">
 <noscript><link rel="stylesheet" href="assets/css/nojs.css"></noscript>
-<link rel="stylesheet" href="assets/css/memorial.css?v=4">
+<link rel="stylesheet" href="assets/css/memorial.css?v=5">
 </head>
 <body>
 
@@ -74,6 +75,11 @@ $presets = [10, 20, 50, 100];
       <span data-count><?= $p['count'] ?></span> <span data-count-label><?= $p['count'] === 1 ? 'persona ha aportado' : 'personas han aportado' ?></span> con cariño
     </p>
 
+    <p class="last-donation<?= $last ? '' : ' is-empty' ?>" data-last aria-live="polite">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 3 5 6.5 5c2.1 0 3.6 1.2 4.5 2.6l1 1.5 1-1.5C13.9 6.2 15.4 5 17.5 5 21 5 23.1 8.6 21.6 11.9 19.5 16.4 12 21 12 21z"/></svg>
+      <span>Última donación: <strong data-last-name><?= e($last['name'] ?? '') ?></strong> <small data-last-ago><?= e($last['ago'] ?? '') ?></small></span>
+    </p>
+
     <?php if ($p['raised'] >= $p['goal']): ?>
       <p class="notice notice-goal">Gracias de corazón: entre todos hemos alcanzado la meta.</p>
     <?php endif; ?>
@@ -110,6 +116,13 @@ $presets = [10, 20, 50, 100];
                    min="<?= $min ?>" max="<?= $max ?>" step="1" placeholder="Ej. 30">
           </div>
         </fieldset>
+        <div class="donor">
+          <label for="donor_name">Tu nombre y apellido</label>
+          <input id="donor_name" name="donor_name" type="text" required minlength="3" maxlength="60"
+                 autocomplete="name" autocapitalize="words" placeholder="Ej. Juan Pérez"
+                 pattern="\s*[^\s]+\s+[^\s].*" title="Escribe tu nombre y apellido">
+          <label class="anon"><input type="checkbox" name="anonymous" value="1"> Prefiero que mi nombre no aparezca en la web</label>
+        </div>
         <div class="hp" aria-hidden="true"><label>No rellenar <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
         <button type="submit" class="btn btn-donate"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 3 5 6.5 5c2.1 0 3.6 1.2 4.5 2.6l1 1.5 1-1.5C13.9 6.2 15.4 5 17.5 5 21 5 23.1 8.6 21.6 11.9 19.5 16.4 12 21 12 21z"/></svg><span>Realiza tu donación</span></button>
         <p class="secure"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h1zm2 0h6V7a3 3 0 0 0-6 0v3z"/></svg> Pago seguro con tarjeta, Apple Pay o Google Pay a través de Stripe. Al pagar puedes dejar un mensaje para la familia.</p>
@@ -128,7 +141,7 @@ $presets = [10, 20, 50, 100];
     <?php foreach ($messages as $m): ?>
       <blockquote>
         <p><?= nl2br(e($m['message'])) ?></p>
-        <cite>— <?= e(trim($m['name'] ?? '') !== '' ? $m['name'] : 'Anónimo') ?></cite>
+        <cite>— <?= e(public_donor_name($m)) ?></cite>
       </blockquote>
     <?php endforeach; ?>
     </div>
@@ -165,6 +178,6 @@ $presets = [10, 20, 50, 100];
 </a>
 <?php endif; ?>
 
-<script src="assets/js/memorial.js?v=3" defer></script>
+<script src="assets/js/memorial.js?v=4" defer></script>
 </body>
 </html>

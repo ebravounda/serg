@@ -332,6 +332,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 flash('Agradecimiento enviado.');
                 go('tab=donations');
 
+            case 'name_hide':
+            case 'name_show':
+                $id = (string) ($_POST['id'] ?? '');
+                store_update('donations', function ($all) use ($id, $action) {
+                    if (isset($all[$id])) {
+                        $all[$id]['name_hidden'] = $action === 'name_hide';
+                    }
+                    return $all;
+                });
+                flash($action === 'name_hide' ? 'El nombre ya no se muestra en la web (aparece como «Anónimo»).' : 'El nombre vuelve a mostrarse en la web.');
+                go('tab=' . (($_POST['tab'] ?? '') === 'stats' ? 'stats' : 'donations'));
+
             case 'message_publish':
             case 'message_hide':
             case 'message_delete':
@@ -401,13 +413,14 @@ if ($logged && isset($_GET['export'])) {
         $out = fopen('php://output', 'w');
         fwrite($out, "\xEF\xBB\xBF"); // para que Excel lea bien los acentos
         $cell = fn($v) => is_string($v) && preg_match('/^[=+\-@\t\r]/', $v) ? "'" . $v : $v; // evita inyección de fórmulas
-        fputcsv($out, ['Fecha', 'Hora', 'País', 'País de la tarjeta', 'Método', 'Tarjeta', 'Nombre', 'Email', 'Donado (€)', 'Reembolsado (€)', 'Comisión Stripe (€)', 'Neto (€)', 'Mensaje', 'ID de Stripe'], ';');
+        fputcsv($out, ['Fecha', 'Hora', 'País', 'País de la tarjeta', 'Método', 'Tarjeta', 'Nombre', 'Anónimo en la web', 'Titular del pago', 'Email', 'Donado (€)', 'Reembolsado (€)', 'Comisión Stripe (€)', 'Neto (€)', 'Mensaje', 'ID de Stripe'], ';');
         foreach (array_reverse(donations()) as $d) {
             $t = local_time((int) $d['created']);
             $eur = fn($c) => number_format(((int) $c) / 100, 2, ',', '');
             fputcsv($out, array_map($cell, [
                 $t->format('d/m/Y'), $t->format('H:i:s'), country_name(donation_country($d)), country_name((string) ($d['card_country'] ?? '')),
-                method_label($d), ($d['last4'] ?? '') !== '' ? '····' . $d['last4'] : '', $d['name'] ?? '', $d['email'] ?? '',
+                method_label($d), ($d['last4'] ?? '') !== '' ? '····' . $d['last4'] : '', $d['name'] ?? '',
+                (!empty($d['anonymous']) || !empty($d['name_hidden'])) ? 'Sí' : 'No', $d['billing_name'] ?? '', $d['email'] ?? '',
                 $eur($d['gross'] ?? $d['amount']), $eur($d['refunded'] ?? 0), isset($d['fee']) ? $eur($d['fee']) : '', $eur(donation_net($d)),
                 $d['message'] ?? '', $d['id'],
             ]), ';');
@@ -625,7 +638,7 @@ $tab = isset($tabs[$_GET['tab'] ?? '']) ? $_GET['tab'] : 'stats';
                 <td><?= e($t->format('H:i:s')) ?></td>
                 <td><?= e(country_name(donation_country($d))) ?><?php if (($d['card_country'] ?? '') !== '' && $d['card_country'] !== ($d['country'] ?? '')): ?><br><small class="hint">tarjeta: <?= e(country_name($d['card_country'])) ?></small><?php endif; ?></td>
                 <td><?= e(method_detail($d)) ?></td>
-                <td><?= e($d['name'] ?: '—') ?><?php if (($d['email'] ?? '') !== ''): ?><br><small class="hint"><?= e($d['email']) ?></small><?php endif; ?></td>
+                <td><?= e($d['name'] ?: '—') ?><?php if (!empty($d['anonymous']) || !empty($d['name_hidden'])): ?> <span class="tag">Anónimo en la web</span><?php endif; ?><?php if (($d['email'] ?? '') !== ''): ?><br><small class="hint"><?= e($d['email']) ?></small><?php endif; ?></td>
                 <td class="num"><?= money((int) ($d['gross'] ?? $d['amount'])) ?></td>
                 <td class="num"><?= isset($d['fee']) ? '− ' . money((int) $d['fee']) : '<span class="hint">pendiente</span>' ?></td>
                 <td class="num"><strong><?= money(donation_net($d)) ?></strong></td>
@@ -720,7 +733,20 @@ $tab = isset($tabs[$_GET['tab'] ?? '']) ? $_GET['tab'] : 'stats';
               <?php foreach ($list as $d): ?>
                 <tr class="<?= $d['amount'] <= 0 ? 'refunded' : '' ?>">
                   <td><?= e(date_es((int) $d['created'], true)) ?></td>
-                  <td><?= e($d['name'] ?: '—') ?></td>
+                  <td>
+                    <?= e($d['name'] ?: '—') ?>
+                    <?php if (!empty($d['anonymous'])): ?><span class="tag" title="El donante pidió no aparecer en la web">Anónimo</span><?php endif; ?>
+                    <?php if (!empty($d['name_hidden'])): ?><span class="tag tag-error" title="Ocultado por un administrador">Oculto</span><?php endif; ?>
+                    <?php if (($d['billing_name'] ?? '') !== '' && normalize_person_name($d['billing_name']) !== $d['name']): ?><br><small class="hint">Titular: <?= e($d['billing_name']) ?></small><?php endif; ?>
+                    <?php if (empty($d['anonymous']) && ($d['name'] ?? '') !== ''): ?>
+                      <form method="post" class="inline-block" <?= empty($d['name_hidden']) ? 'data-confirm="' . e('¿Ocultar «' . $d['name'] . '» de la web? Aparecerá como «Anónimo».') . '"' : '' ?>>
+                        <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
+                        <input type="hidden" name="tab" value="donations">
+                        <input type="hidden" name="id" value="<?= e($d['id']) ?>">
+                        <button name="action" value="<?= empty($d['name_hidden']) ? 'name_hide' : 'name_show' ?>" class="link small"><?= empty($d['name_hidden']) ? 'Ocultar nombre en la web' : 'Volver a mostrar' ?></button>
+                      </form>
+                    <?php endif; ?>
+                  </td>
                   <td><?= e($d['email'] ?: '—') ?></td>
                   <td class="num"><?= $d['amount'] > 0 ? money((int) $d['amount']) : 'Reembolsado' ?></td>
                   <td>

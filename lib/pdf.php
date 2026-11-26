@@ -278,7 +278,7 @@ function build_report_pdf(bool $withNames): string
         $nextCol = $withNames ? $cols['who'] : $textEnd;
         $pdf->text($cols['m'], $y, $pdf->fit(method_label($d), $nextCol - $cols['m'] - 6, $fs), $fs, false, 'L', $grey);
         if ($withNames) {
-            $pdf->text($cols['who'], $y, $pdf->fit(trim((string) $d['name']) ?: 'Anónimo', $textEnd - $cols['who'], $fs), $fs, false, 'L', $grey);
+            $pdf->text($cols['who'], $y, $pdf->fit(public_donor_name($d), $textEnd - $cols['who'], $fs), $fs, false, 'L', $grey);
         }
         $pdf->text($cols['b'], $y, money((int) ($d['gross'] ?? $d['amount'])), $fs, false, 'R', $grey);
         $pdf->text($cols['c'], $y, isset($d['fee']) ? money((int) $d['fee']) : '—', $fs, false, 'R', $grey);

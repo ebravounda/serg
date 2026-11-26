@@ -138,6 +138,35 @@ svg { display: inline-block; }
 .progress-meta { margin: 0; font-size: 14px; color: var(--muted); text-align: left; }
 .progress-meta [data-percent] { color: var(--accent); font-weight: 600; }
 
+/* Última donación */
+.last-donation {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin: 18px auto 0; padding: 10px 18px; width: fit-content; max-width: 100%;
+  border-radius: 99px; background: #f6eee2; border: 1px solid #eadcc6;
+  font-size: 15px; color: var(--soft); line-height: 1.4;
+}
+.last-donation.is-empty { display: none; }
+.last-donation svg { width: 16px; height: 16px; fill: var(--rose); flex: none; }
+.last-donation strong { color: var(--accent-2); font-weight: 600; }
+.last-donation small { color: var(--muted); font-size: 13px; margin-left: 2px; white-space: nowrap; }
+.last-donation.is-new { animation: newdon 1.6s ease; }
+@keyframes newdon {
+  0% { transform: scale(.96); box-shadow: 0 0 0 0 rgba(195, 147, 86, .5); }
+  40% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(195, 147, 86, 0); }
+  100% { transform: none; }
+}
+
+/* Nombre del donante */
+.donor { margin-top: 18px; }
+.donor > label { display: block; font-size: 14px; color: var(--soft); margin-bottom: 6px; }
+.donor input[type=text] {
+  width: 100%; padding: 13px 14px; font: inherit; font-size: 17px;
+  border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink);
+}
+.donor input[type=text]:focus { outline: 2px solid var(--gold); outline-offset: 1px; border-color: var(--gold); }
+.anon { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 14px; color: var(--muted); cursor: pointer; }
+.anon input { width: 16px; height: 16px; accent-color: var(--accent); }
+
 .notice { margin: 22px 0 0; padding: 12px 16px; border-radius: 10px; background: #f6efe4; font-size: 15px; color: var(--soft); text-align: left; }
 .notice-goal { background: #f3ead8; color: var(--accent); border: 1px solid var(--gold-2); text-align: center; }
 .notice-error { background: #f8e9e5; color: var(--error); }

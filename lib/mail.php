@@ -221,7 +221,7 @@ function notify_new_donation(string $donationId): void
     }
     $p = progress();
     $text = "Nueva donación de " . money((int) $d['amount'])
-        . ($d['name'] ? ' de ' . $d['name'] : '') . ($d['email'] ? ' (' . $d['email'] . ')' : '') . ".\n\n"
+        . ($d['name'] ? ' de ' . $d['name'] . (!empty($d['anonymous']) ? ' (pidió aparecer como anónimo)' : '') : '') . ($d['email'] ? ' (' . $d['email'] . ')' : '') . ".\n\n"
         . (trim($d['message'] ?? '') !== '' ? "Mensaje: «" . $d['message'] . "»\n\n" : '')
         . "Recaudado: " . money($p['raised']) . ' de ' . money($p['goal']) . " ({$p['percent']}%).\n\n"
         . site_url('admin/');

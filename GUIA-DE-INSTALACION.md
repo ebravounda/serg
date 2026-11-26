@@ -243,7 +243,7 @@ Panel → **Actualizaciones**: publica la primera, por ejemplo *«Abrimos la col
 Con las claves de prueba **no se cobra dinero real**.
 
 1. Abre la web `https://sergio.tudominio.com` (mejor desde el móvil, para verla como la verá la gente).
-2. Elige **20 €** → **Realiza tu donación**.
+2. Elige **20 €**, escribe un **nombre y apellido** (ej. `Juan Pérez`) → **Realiza tu donación**.
 3. En la página de pago de Stripe usa:
    - Correo: **el tuyo** (para recibir el agradecimiento)
    - Tarjeta: **`4242 4242 4242 4242`**
@@ -252,6 +252,7 @@ Con las claves de prueba **no se cobra dinero real**.
 4. Pulsa **Donar**. Debes ver la página **«Gracias»**.
 5. Comprueba:
    - ✅ La **barra** de la web ha subido (unos 19,45 €: 20 € menos la comisión de Stripe).
+   - ✅ Debajo de la barra aparece **«Última donación: Juan Pérez»**.
    - ✅ Te ha llegado el **correo de agradecimiento** (y el **aviso** si lo configuraste).
    - ✅ Panel → **Estadísticas**: aparece la donación con hora, país, tarjeta, comisión y neto.
    - ✅ Panel → **Mensajes**: aparece tu mensaje (puedes publicarlo u ocultarlo).
@@ -307,6 +308,7 @@ Guarda y comprueba que `http://sergio.tudominio.com` te lleva a `https://`.
 | Enseñar las cuentas a alguien | Panel → Estadísticas → **Descargar PDF (anónimo)** |
 | Tener todo en Excel | Panel → Estadísticas → **Excel / CSV completo** (incluye correos: solo para vosotros) |
 | Reenviar un agradecimiento | Panel → **Donaciones** → *Reenviar* |
+| Quitar de la web un nombre inapropiado | Panel → **Donaciones** → *Ocultar nombre en la web* (aparecerá como «Anónimo») |
 | Escribir a todos los donantes | Panel → **Correos** → *Enviar un mensaje a los donantes* (prueba primero con *Enviarme una prueba*) |
 | Cerrar la colecta | Panel → **Ajustes** → desmarca *Donaciones abiertas* |
 | Cambiar la contraseña | Panel → **Conexiones** → *Contraseña del panel* |

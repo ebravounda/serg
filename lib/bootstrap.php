@@ -400,7 +400,10 @@ function record_payment_intent(array $pi, array $extra = []): bool
         'amount' => max(0, $gross - $refunded),          // lo aportado (descontando reembolsos)
         'currency' => $pi['currency'] ?? 'eur',
         'created' => (int) ($pi['created'] ?? time()),
-        'name' => $extra['name'] ?? ($charge['billing_details']['name'] ?? ''),
+        // nombre que el donante escribió en la web; si no hay, el del pago
+        'name' => normalize_person_name((string) (($pi['metadata']['donor_name'] ?? '') ?: ($extra['name'] ?? ($charge['billing_details']['name'] ?? '')))),
+        'billing_name' => (string) ($extra['name'] ?? ($charge['billing_details']['name'] ?? '')),
+        'anonymous' => ($pi['metadata']['donor_anonymous'] ?? '') === '1',
         'email' => $extra['email'] ?? ($charge['billing_details']['email'] ?? ($pi['receipt_email'] ?? '')),
         'country' => strtoupper((string) ($extra['country'] ?? ($charge['billing_details']['address']['country'] ?? ''))),
         'card_country' => strtoupper((string) ($card['country'] ?? '')),
@@ -430,8 +433,11 @@ function record_payment_intent(array $pi, array $extra = []): bool
     store_update('donations', function (array $all) use ($row, &$isNew) {
         $old = $all[$row['id']] ?? [];
         $isNew = !$old;
+        if ($isNew) {
+            $row['seq'] = microtime(true); // orden de llegada (desempate si dos pagos caen en el mismo segundo)
+        }
         // conserva datos ya conocidos si el nuevo dato viene vacío
-        foreach (['name', 'email', 'message', 'country', 'card_country', 'method', 'brand', 'last4', 'wallet', 'charge_id'] as $k) {
+        foreach (['name', 'billing_name', 'email', 'message', 'country', 'card_country', 'method', 'brand', 'last4', 'wallet', 'charge_id'] as $k) {
             if (($row[$k] ?? '') === '' && !empty($old[$k])) {
                 $row[$k] = $old[$k];
             }
@@ -544,7 +550,7 @@ function mode_donations(): array
 function donations(): array
 {
     $list = array_values(mode_donations());
-    usort($list, fn($a, $b) => $b['created'] <=> $a['created']);
+    usort($list, fn($a, $b) => ($b['created'] <=> $a['created']) ?: (($b['seq'] ?? 0) <=> ($a['seq'] ?? 0)));
     return $list;
 }
 
@@ -566,6 +572,63 @@ function progress(): array
         'count' => $count,
         'percent' => min(100, (int) floor($raised * 100 / $goal)),
     ];
+}
+
+/** Limpia un nombre de persona: sin caracteres raros, espacios normales y mayúscula inicial. */
+function normalize_person_name(string $name): string
+{
+    $name = preg_replace('/[^\p{L}\p{M} .\'’-]+/u', '', $name) ?? '';
+    $name = trim(preg_replace('/\s+/u', ' ', $name) ?? '');
+    $name = mb_substr($name, 0, 60);
+    if ($name === '') {
+        return '';
+    }
+    $words = explode(' ', mb_convert_case(mb_strtolower($name), MB_CASE_TITLE));
+    foreach ($words as $i => $w) { // partículas en minúscula: «de la Fuente», «del Río»
+        if ($i > 0 && in_array(mb_strtolower($w), ['de', 'del', 'la', 'las', 'los', 'y', 'da', 'do', 'dos', 'van', 'von'], true)) {
+            $words[$i] = mb_strtolower($w);
+        }
+    }
+    return implode(' ', $words);
+}
+
+/** Nombre que se puede mostrar en público (respeta el anonimato y lo que oculte el admin). */
+function public_donor_name(array $d): string
+{
+    if (!empty($d['anonymous']) || !empty($d['name_hidden']) || trim((string) ($d['name'] ?? '')) === '') {
+        return 'Anónimo';
+    }
+    return (string) $d['name'];
+}
+
+/** Hace cuánto: «hace 5 minutos», «hace 2 horas», «ayer»… */
+function time_ago(int $ts): string
+{
+    $d = max(0, time() - $ts);
+    if ($d < 60) {
+        return 'hace un momento';
+    }
+    if ($d < 3600) {
+        $m = intdiv($d, 60);
+        return 'hace ' . $m . ($m === 1 ? ' minuto' : ' minutos');
+    }
+    if ($d < 86400) {
+        $h = intdiv($d, 3600);
+        return 'hace ' . $h . ($h === 1 ? ' hora' : ' horas');
+    }
+    $days = intdiv($d, 86400);
+    return $days === 1 ? 'ayer' : 'hace ' . $days . ' días';
+}
+
+/** Última donación válida (para «Última donación: Juan Pérez»). */
+function last_donation(): ?array
+{
+    foreach (donations() as $d) {
+        if ((int) $d['amount'] > 0) {
+            return ['name' => public_donor_name($d), 'ago' => time_ago((int) $d['created']), 'created' => (int) $d['created']];
+        }
+    }
+    return null;
 }
 
 /** Mensajes de los donantes que el admin ha decidido publicar. */
